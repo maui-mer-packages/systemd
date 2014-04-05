@@ -1,6 +1,6 @@
 Name:           systemd
 URL:            http://www.freedesktop.org/wiki/Software/systemd
-Version:        208
+Version:        212
 Release:        1
 License:        LGPLv2+ and MIT and GPLv2+
 Group:          System/System Control
@@ -31,7 +31,7 @@ Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.t
 Source1:        systemd-stop-user-sessions.service
 Source2:        tests.xml
 Source3:        systemctl-user
-Patch0:         systemd-208-video.patch
+Patch0:         systemd-212-video.patch
 Patch1:         systemd-208-pkgconfigdir.patch
 Patch2:         systemd-187-remove-display-manager.service.patch
 Patch3:         systemd-187-make-readahead-depend-on-sysinit.patch
@@ -165,6 +165,8 @@ glib-based applications using libudev functionality.
   --with-firmware-path=/lib/firmware/updates:/lib/firmware:/system/etc/firmware:/etc/firmware:/vendor/firmware:/firmware/image \
   --disable-manpages \
   --disable-python-devel \
+  --disable-kdbus \
+  --enable-compat-libs \
   --enable-tests
 
 make %{?_smp_mflags}
@@ -245,6 +247,8 @@ install -m 644 %{SOURCE2} %{buildroot}/opt/tests/systemd-tests
 mkdir -p %{buildroot}/lib/security/
 mv %{buildroot}%{_libdir}/security/pam_systemd.so %{buildroot}/lib/security/pam_systemd.so
 
+%find_lang %{name}
+
 %pre
 getent group cdrom >/dev/null 2>&1 || groupadd -r -g 11 cdrom >/dev/null 2>&1 || :
 getent group tape >/dev/null 2>&1 || groupadd -r -g 33 tape >/dev/null 2>&1 || :
@@ -268,7 +272,7 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %post -n libgudev1 -p /sbin/ldconfig
 %postun -n libgudev1 -p /sbin/ldconfig
 
-%files
+%files -f %{name}.lang
 %defattr(-,root,root,-)
 %dir %{_sysconfdir}/systemd
 %dir %{_sysconfdir}/systemd/system
@@ -340,6 +344,7 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_bindir}/localectl
 %{_bindir}/timedatectl
 %{_bindir}/bootctl
+%{_bindir}/busctl
 %{_sbindir}/udevadm
 /%{_lib}/systemd
 %{_datadir}/dbus-1/*/org.freedesktop.systemd1.*
@@ -349,15 +354,15 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_datadir}/dbus-1/system-services/org.freedesktop.locale1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.timedate1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.machine1.service
-%{_datadir}/dbus-1/interfaces/org.freedesktop.hostname1.xml
-%{_datadir}/dbus-1/interfaces/org.freedesktop.locale1.xml
-%{_datadir}/dbus-1/interfaces/org.freedesktop.timedate1.xml
 %{_datadir}/polkit-1/actions/org.freedesktop.systemd1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.hostname1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.login1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.locale1.policy
 %{_datadir}/polkit-1/actions/org.freedesktop.timedate1.policy
+%{_datadir}/bash-completion/completions/bootctl
+%{_datadir}/bash-completion/completions/busctl
 %{_datadir}/bash-completion/completions/hostnamectl
+%{_datadir}/bash-completion/completions/machinectl
 %{_datadir}/bash-completion/completions/journalctl
 %{_datadir}/bash-completion/completions/localectl
 %{_datadir}/bash-completion/completions/loginctl
@@ -365,11 +370,17 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_datadir}/bash-completion/completions/timedatectl
 %{_datadir}/bash-completion/completions/udevadm
 %{_datadir}/bash-completion/completions/systemd-analyze
-%{_datadir}/bash-completion/completions/kernel-install
+%{_datadir}/bash-completion/completions/systemd-cat
+%{_datadir}/bash-completion/completions/systemd-cgls
+%{_datadir}/bash-completion/completions/systemd-cgtop
+%{_datadir}/bash-completion/completions/systemd-delta
+%{_datadir}/bash-completion/completions/systemd-detect-virt
+%{_datadir}/bash-completion/completions/systemd-nspawn
 %{_datadir}/bash-completion/completions/systemd-run
+%{_datadir}/bash-completion/completions/kernel-install
 %{_datadir}/zsh/site-functions/*
 
-/usr/lib/systemd/catalog/systemd.catalog
+/usr/lib/systemd/catalog/systemd*.catalog
 /usr/lib/kernel/install.d/50-depmod.install
 /usr/lib/kernel/install.d/90-loaderentry.install
 
@@ -418,6 +429,7 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_libdir}/libsystemd-login.so.*
 %{_libdir}/libsystemd-journal.so.*
 %{_libdir}/libsystemd-id128.so.*
+%{_libdir}/libsystemd.so.*
 %{_libdir}/libudev.so.*
 
 %files devel
@@ -427,19 +439,21 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_libdir}/libsystemd-journal.so
 %{_libdir}/libsystemd-id128.so
 %{_libdir}/libudev.so
+%{_libdir}/libsystemd.so
+%{_includedir}/systemd/_sd-common.h
 %{_includedir}/systemd/sd-daemon.h
 %{_includedir}/systemd/sd-login.h
 %{_includedir}/systemd/sd-journal.h
 %{_includedir}/systemd/sd-id128.h
 %{_includedir}/systemd/sd-messages.h
-%{_includedir}/systemd/sd-shutdown.h
 %{_includedir}/libudev.h
 %{_libdir}/pkgconfig/libsystemd-daemon.pc
 %{_libdir}/pkgconfig/libsystemd-login.pc
 %{_libdir}/pkgconfig/libsystemd-journal.pc
 %{_libdir}/pkgconfig/libsystemd-id128.pc
-%{_libdir}/pkgconfig/libudev.pc
+%{_libdir}/pkgconfig/libsystemd.pc
 %{_libdir}/pkgconfig/systemd.pc
+%{_libdir}/pkgconfig/libudev.pc
 %{_libdir}/pkgconfig/udev.pc
 
 %files -n libgudev1
