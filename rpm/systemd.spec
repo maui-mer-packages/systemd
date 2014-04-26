@@ -36,6 +36,7 @@ Patch1:         systemd-208-pkgconfigdir.patch
 Patch2:         systemd-187-remove-display-manager.service.patch
 Patch3:         systemd-187-make-readahead-depend-on-sysinit.patch
 Patch4:         systemd-208-install-test-binaries.patch
+Patch5:         systemd-212-no-relative-symlink.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -155,6 +156,7 @@ glib-based applications using libudev functionality.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 %build
 ./autogen.sh

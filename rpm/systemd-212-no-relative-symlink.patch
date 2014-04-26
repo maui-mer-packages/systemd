@@ -1,0 +1,93 @@
+From 8bb160a41ea73d8a7e8da59bc512493b03e20d22 Mon Sep 17 00:00:00 2001
+From: Pier Luigi Fiorini <pierluigi.fiorini@gmail.com>
+Date: Sat, 26 Apr 2014 10:59:51 +0000
+Subject: [PATCH] Don't use --relative for symlinks
+
+It requires coreutils 8.x.
+---
+ Makefile.am | 26 ++++++++------------------
+ 1 file changed, 8 insertions(+), 18 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 3d9e5c1..a24495f 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -208,8 +208,8 @@ define move-to-rootlibdir
+ 	if test "$(libdir)" != "$(rootlibdir)"; then \
+ 		$(MKDIR_P) $(DESTDIR)$(rootlibdir) && \
+ 		so_img_name=$$(readlink $(DESTDIR)$(libdir)/$$libname) && \
+-		rm -f $(DESTDIR)$(libdir)/$$libname && \
+-		$(LN_S) --relative -f $(DESTDIR)$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
++		so_img_rel_target_prefix=$$(echo $(libdir) | sed 's,\(^/\|\)[^/][^/]*,..,g') && \
++		$(LN_S) -f $$so_img_rel_target_prefix$(rootlibdir)/$$so_img_name $(DESTDIR)$(libdir)/$$libname && \
+ 		mv $(DESTDIR)$(libdir)/$$libname.* $(DESTDIR)$(rootlibdir); \
+ 	fi
+ endef
+@@ -233,6 +233,7 @@ USER_BUSNAMES_TARGET_WANTS =
+ 
+ SYSTEM_UNIT_ALIASES =
+ USER_UNIT_ALIASES =
++
+ GENERAL_ALIASES =
+ 
+ install-target-wants-hook:
+@@ -268,9 +269,9 @@ install-aliases-hook:
+ 	set -- $(SYSTEM_UNIT_ALIASES) && \
+ 		dir=$(systemunitdir) && $(install-aliases)
+ 	set -- $(USER_UNIT_ALIASES) && \
+-		dir=$(userunitdir) && $(install-relative-aliases)
++		dir=$(userunitdir) && $(install-aliases)
+ 	set -- $(GENERAL_ALIASES) && \
+-		dir= && $(install-relative-aliases)
++		dir= && $(install-aliases)
+ 
+ define install-aliases
+ 	while [ -n "$$1" ]; do \
+@@ -281,15 +282,6 @@ define install-aliases
+ 	done
+ endef
+ 
+-define install-relative-aliases
+-	while [ -n "$$1" ]; do \
+-		$(MKDIR_P) `dirname $(DESTDIR)$$dir/$$2` && \
+-		rm -f $(DESTDIR)$$dir/$$2 && \
+-		$(LN_S) --relative $(DESTDIR)$$1 $(DESTDIR)$$dir/$$2 && \
+-		shift 2 || exit $$?; \
+-	done
+-endef
+-
+ INSTALL_EXEC_HOOKS += \
+ 	install-target-wants-hook \
+ 	install-directories-hook \
+@@ -1884,8 +1876,7 @@ systemd_dbus1_generator_LDADD = \
+ 
+ dbus1-generator-install-hook:
+ 	$(AM_V_at)$(MKDIR_P) $(DESTDIR)$(usergeneratordir)
+-	$(AM_V_RM)rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+-	$(AM_V_LN)$(LN_S) --relative -f $(DESTDIR)$(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
++	$(AM_V_LN)$(LN_S) -f $(systemgeneratordir)/systemd-dbus1-generator $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+ 
+ dbus1-generator-uninstall-hook:
+ 	rm -f $(DESTDIR)$(usergeneratordir)/systemd-dbus1-generator
+@@ -2017,8 +2008,7 @@ systemd_bus_proxyd_LDADD = \
+ 
+ bus-proxyd-install-hook:
+ 	$(AM_V_at)$(MKDIR_P) $(DESTDIR)$(bindir)
+-	$(AM_V_RM)rm -f $(DESTDIR)$(bindir)/systemd-stdio-bridge
+-	$(AM_V_LN)$(LN_S) --relative -f $(DESTDIR)$(rootlibexecdir)/systemd-bus-proxyd $(DESTDIR)$(bindir)/systemd-stdio-bridge
++	$(AM_V_LN)$(LN_S) -f $(rootlibexecdir)/systemd-bus-proxyd $(DESTDIR)$(bindir)/systemd-stdio-bridge
+ 
+ bus-proxyd-uninstall-hook:
+ 	rm -f $(DESTDIR)$(bindir)/systemd-stdio-bridge
+@@ -4959,7 +4949,7 @@ GENERAL_ALIASES += \
+ 	$(systemunitdir)/remote-fs.target $(pkgsysconfdir)/system/multi-user.target.wants/remote-fs.target \
+ 	$(systemunitdir)/getty@.service $(pkgsysconfdir)/system/getty.target.wants/getty@tty1.service \
+ 	$(pkgsysconfdir)/user $(sysconfdir)/xdg/systemd/user \
+-	$(dbussystemservicedir)/org.freedesktop.systemd1.service $(dbussessionservicedir)/org.freedesktop.systemd1.service
++	../system-services/org.freedesktop.systemd1.service $(dbussessionservicedir)/org.freedesktop.systemd1.service
+ 
+ if HAVE_SYSV_COMPAT
+ INSTALL_DIRS += \
+-- 
+1.8.3-rc3
+
