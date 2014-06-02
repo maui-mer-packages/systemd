@@ -249,6 +249,11 @@ install -m 644 %{SOURCE2} %{buildroot}/opt/tests/systemd-tests
 mkdir -p %{buildroot}/lib/security/
 mv %{buildroot}%{_libdir}/security/pam_systemd.so %{buildroot}/lib/security/pam_systemd.so
 
+# Move rpm macros
+mkdir -p %{buildroot}%{_sysconfdir}/rpm
+mv %{buildroot}%{_libdir}/rpm/macros.d/macros.systemd %{buildroot}%{_sysconfdir}/rpm/macros.systemd
+rm -rf %{buildroot}%{_libdir}/rpm
+
 %find_lang %{name}
 
 %pre
@@ -310,7 +315,7 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %config(noreplace) %{_sysconfdir}/systemd/bootchart.conf
 %config(noreplace) %{_sysconfdir}/pam.d/systemd-user
 %ghost %{_sysconfdir}/udev/hwdb.bin
-%{_libdir}/rpm/macros.d/macros.systemd
+%{_sysconfdir}/rpm/macros.systemd
 %{_sysconfdir}/init.d/README
 %config(noreplace) %{_sysconfdir}/xdg/systemd/user
 %{_sysconfdir}/systemd/system/*
