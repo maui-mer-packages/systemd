@@ -29,10 +29,8 @@ Requires:       systemd-config
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:        systemd-stop-user-sessions.service
-Source2:        tests.xml
 Source3:        systemctl-user
 Patch1:         systemd-208-pkgconfigdir.patch
-Patch2:         systemd-208-install-test-binaries.patch
 Patch3:         systemd-212-no-relative-symlink.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
@@ -116,15 +114,6 @@ Requires:  %{name} = %{version}-%{release}
 %description docs
 This package includes the man pages for systemd.
 
-%package tests
-Summary:   Systemd tests
-Group:     System/System Control
-Requires:  %{name} = %{version}-%{release}
-Requires:  blts-tools
-
-%description tests
-This package includes tests for systemd.
-
 %package -n libgudev1
 Summary:        Libraries for adding libudev support to applications that use glib
 Group:          Development/Libraries
@@ -149,7 +138,6 @@ glib-based applications using libudev functionality.
 %prep
 %setup -q -n %{name}-%{version}/systemd
 %patch1 -p1
-%patch2 -p1
 %patch3 -p1
 
 %build
@@ -163,7 +151,7 @@ glib-based applications using libudev functionality.
   --disable-python-devel \
   --disable-kdbus \
   --enable-compat-libs \
-  --enable-tests
+  --disable-tests
 
 make %{?_smp_mflags}
 
@@ -235,10 +223,6 @@ ln -s ../systemd-stop-user-sessions.service %{buildroot}/lib/systemd/system/shut
 install -D -m 755 %{SOURCE3} %{buildroot}/bin/systemctl-user
 
 %fdupes  %{buildroot}/%{_datadir}/man/
-
-# Install tests.xml
-install -d -m 755 %{buildroot}/opt/tests/systemd-tests
-install -m 644 %{SOURCE2} %{buildroot}/opt/tests/systemd-tests
 
 mkdir -p %{buildroot}/lib/security/
 mv %{buildroot}%{_libdir}/security/pam_systemd.so %{buildroot}/lib/security/pam_systemd.so
@@ -462,11 +446,6 @@ fi
 %files docs
 %defattr(-,root,root,-)
 #%doc %{_mandir}/man?/*
-
-%files tests
-%defattr(-,root,root,-)
-/opt/tests/systemd-tests/tests.xml
-/opt/tests/systemd-tests/bin/test-*
 
 %files analyze
 %defattr(-,root,root,-)
