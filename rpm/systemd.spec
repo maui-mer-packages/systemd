@@ -20,6 +20,7 @@ BuildRequires:  gperf
 BuildRequires:  xz-devel
 BuildRequires:  kmod-devel >= 15
 BuildRequires:  fdupes
+BuildRequires:  coreutils >= 8.0
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:       dbus
@@ -30,7 +31,6 @@ Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:        systemd-stop-user-sessions.service
 Patch1:         systemd-208-pkgconfigdir.patch
-Patch3:         systemd-212-no-relative-symlink.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -137,7 +137,6 @@ glib-based applications using libudev functionality.
 %prep
 %setup -q -n %{name}-%{version}/systemd
 %patch1 -p1
-%patch3 -p1
 
 %build
 ./autogen.sh
