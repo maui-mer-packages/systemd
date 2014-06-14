@@ -29,7 +29,6 @@ Requires:       systemd-config
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:        systemd-stop-user-sessions.service
-Source3:        systemctl-user
 Patch1:         systemd-208-pkgconfigdir.patch
 Patch3:         systemd-212-no-relative-symlink.patch
 Provides:       udev = %{version}
@@ -219,9 +218,6 @@ install -D -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/systemd-stop-user-s
 mkdir -p %{buildroot}/lib/systemd/system/shutdown.target.wants
 ln -s ../systemd-stop-user-sessions.service %{buildroot}/lib/systemd/system/shutdown.target.wants/systemd-stop-user-sessions.service
 
-# Add systemctl-user helper script
-install -D -m 755 %{SOURCE3} %{buildroot}/bin/systemctl-user
-
 %fdupes  %{buildroot}/%{_datadir}/man/
 
 mkdir -p %{buildroot}/lib/security/
@@ -354,7 +350,6 @@ fi
 /lib/udev/*
 
 /bin/systemctl
-/bin/systemctl-user
 /bin/systemd-notify
 /bin/systemd-ask-password
 /bin/systemd-tty-ask-password-agent
