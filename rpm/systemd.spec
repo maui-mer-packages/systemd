@@ -1,6 +1,6 @@
 Name:           systemd
 URL:            http://www.freedesktop.org/wiki/Software/systemd
-Version:        212
+Version:        214
 Release:        1
 License:        LGPLv2+ and MIT and GPLv2+
 Group:          System/System Control
@@ -254,8 +254,17 @@ rm -rf %{buildroot}%{_libdir}/rpm
 getent group cdrom >/dev/null 2>&1 || groupadd -r -g 11 cdrom >/dev/null 2>&1 || :
 getent group tape >/dev/null 2>&1 || groupadd -r -g 33 tape >/dev/null 2>&1 || :
 getent group dialout >/dev/null 2>&1 || groupadd -r -g 18 dialout >/dev/null 2>&1 || :
-getent group floppy >/dev/null 2>&1 || groupadd -r -g 19 floppy >/dev/null 2>&1 || :
 getent group systemd-journal >/dev/null 2>&1 || groupadd -r -g 190 systemd-journal 2>&1 || :
+getent group systemd-timesync >/dev/null 2>&1 || groupadd -r systemd-timesync 2>&1 || :
+getent passwd systemd-timesync >/dev/null 2>&1 || useradd -r -l -g systemd-timesync -d / -s /usr/sbin/nologin -c "systemd Time Synchronization" systemd-timesync >/dev/null 2>&1 || :
+getent group systemd-network >/dev/null 2>&1 || groupadd -r systemd-network 2>&1 || :
+getent passwd systemd-network >/dev/null 2>&1 || useradd -r -l -g systemd-network -d / -s /usr/sbin/nologin -c "systemd Network Management" systemd-network >/dev/null 2>&1 || :
+getent group systemd-resolve >/dev/null 2>&1 || groupadd -r systemd-resolve 2>&1 || :
+getent passwd systemd-resolve >/dev/null 2>&1 || useradd -r -l -g systemd-resolve -d / -s /usr/sbin/nologin -c "systemd Resolver" systemd-resolve >/dev/null 2>&1 || :
+getent group systemd-bus-proxy >/dev/null 2>&1 || groupadd -r systemd-bus-proxy 2>&1 || :
+getent passwd systemd-bus-proxy >/dev/null 2>&1 || useradd -r -l -g systemd-bus-proxy -d / -s /usr/sbin/nologin -c "systemd Bus Proxy" systemd-bus-proxy >/dev/null 2>&1 || :
+getent group systemd-journal-gateway >/dev/null 2>&1 || groupadd -r -g 191 systemd-journal-gateway 2>&1 || :
+getent passwd systemd-journal-gateway >/dev/null 2>&1 || useradd -r -l -u 191 -g systemd-journal-gateway -d %{_localstatedir}/log/journal -s /usr/sbin/nologin -c "Journal Gateway" systemd-journal-gateway >/dev/null 2>&1 || :
 
 systemctl stop systemd-udevd-control.socket systemd-udevd-kernel.socket systemd-udevd.service >/dev/null 2>&1 || :
 
@@ -266,6 +275,40 @@ systemctl daemon-reexec >/dev/null 2>&1 || :
 systemctl start systemd-udevd.service >/dev/null 2>&1 || :
 udevadm hwdb --update >/dev/null 2>&1 || :
 journalctl --update-catalog >/dev/null 2>&1 || :
+systemd-tmpfiles --create >/dev/null 2>&1 || :
+
+# Make sure new journal files will be owned by the "systemd-journal" group
+chgrp systemd-journal /run/log/journal/ /run/log/journal/`cat /etc/machine-id 2> /dev/null` /var/log/journal/ /var/log/journal/`cat /etc/machine-id 2> /dev/null` >/dev/null 2>&1 || :
+chmod g+s /run/log/journal/ /run/log/journal/`cat /etc/machine-id 2> /dev/null` /var/log/journal/ /var/log/journal/`cat /etc/machine-id 2> /dev/null` >/dev/null 2>&1 || :
+
+# Apply ACL to the journal directory
+setfacl -Rnm g:wheel:rx,d:g:wheel:rx,g:adm:rx,d:g:adm:rx /var/log/journal/ >/dev/null 2>&1 || :
+
+# Move old stuff around in /var/lib
+mv %{_localstatedir}/lib/random-seed %{_localstatedir}/lib/systemd/random-seed >/dev/null 2>&1 || :
+mv %{_localstatedir}/lib/backlight %{_localstatedir}/lib/systemd/backlight >/dev/null 2>&1 || :
+
+if [ $1 -eq 1 ] ; then
+	for unit in systemd-journal-gatewayd.socket systemd-journal-gatewayd.service; do
+		systemctl preset $unit > /dev/null 2>&1 || :
+	done
+fi
+
+%preun
+if [ $1 -eq 0 ] ; then
+	for unit in systemd-journal-gatewayd.socket systemd-journal-gatewayd.service; do
+		systemctl --no-reload disable $unit > /dev/null 2>&1 || :
+		systemctl stop $unit > /dev/null 2>&1 || :
+	done
+fi
+
+%postun
+if [ $1 -ge 1 ] ; then
+	systemctl daemon-reload > /dev/null 2>&1 || :
+	for unit in systemd-logind.service systemd-journal-gatewayd.service; do
+		systemctl try-restart $unit >/dev/null 2>&1 || :
+	done
+fi
 
 %post libs -p /sbin/ldconfig
 %postun libs -p /sbin/ldconfig
@@ -296,6 +339,7 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %dir %{_localstatedir}/lib/systemd
 %dir %{_localstatedir}/lib/systemd/catalog
 %dir %{_localstatedir}/lib/systemd/coredump
+%ghost %dir %{_localstatedir}/lib/systemd/backlight
 %ghost %{_localstatedir}/lib/systemd/random-seed
 %ghost %{_localstatedir}/lib/systemd/catalog/database
 
@@ -316,8 +360,13 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %{_libdir}/tmpfiles.d/*
 %{_libdir}/sysctl.d/50-default.conf
 %{_libdir}/systemd/user/*
-%dir /lib/udev/
 
+%{_libdir}/systemd/system/systemd-journal-gatewayd.*
+%{_libdir}/systemd/systemd-journal-gatewayd
+#%{_mandir}/man8/systemd-journal-gatewayd.*
+%{_datadir}/systemd/gatewayd
+
+%dir /lib/udev/
 /lib/udev/*
 
 /bin/systemctl
@@ -468,4 +517,3 @@ journalctl --update-catalog >/dev/null 2>&1 || :
 %dir %attr(0755,root,root) %{_includedir}/gudev-1.0/gudev
 %attr(0644,root,root) %{_includedir}/gudev-1.0/gudev/*.h
 %attr(0644,root,root) %{_libdir}/pkgconfig/gudev-1.0.pc
-
