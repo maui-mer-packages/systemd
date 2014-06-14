@@ -192,9 +192,6 @@ mkdir -p %{buildroot}%{_prefix}/lib/systemd/user-preset/
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-shutdown/
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/system-sleep/
 
-# Make sure the NTP units dir exists
-mkdir -p %{buildroot}%{_prefix}/lib/systemd/ntp-units.d/
-
 # Make sure directories in /var exist
 mkdir -p %{buildroot}%{_localstatedir}/lib/systemd/coredump
 mkdir -p %{buildroot}%{_localstatedir}/lib/systemd/catalog
@@ -263,10 +260,6 @@ chmod g+s /run/log/journal/ /run/log/journal/`cat /etc/machine-id 2> /dev/null` 
 # Apply ACL to the journal directory
 setfacl -Rnm g:wheel:rx,d:g:wheel:rx,g:adm:rx,d:g:adm:rx /var/log/journal/ >/dev/null 2>&1 || :
 
-# Move old stuff around in /var/lib
-mv %{_localstatedir}/lib/random-seed %{_localstatedir}/lib/systemd/random-seed >/dev/null 2>&1 || :
-mv %{_localstatedir}/lib/backlight %{_localstatedir}/lib/systemd/backlight >/dev/null 2>&1 || :
-
 if [ $1 -eq 1 ] ; then
 	for unit in systemd-journal-gatewayd.socket systemd-journal-gatewayd.service; do
 		systemctl preset $unit > /dev/null 2>&1 || :
@@ -318,7 +311,6 @@ fi
 %dir %{_localstatedir}/lib/systemd
 %dir %{_localstatedir}/lib/systemd/catalog
 %dir %{_localstatedir}/lib/systemd/coredump
-%ghost %dir %{_localstatedir}/lib/systemd/backlight
 %ghost %{_localstatedir}/lib/systemd/random-seed
 %ghost %{_localstatedir}/lib/systemd/catalog/database
 
@@ -339,11 +331,6 @@ fi
 %{_libdir}/tmpfiles.d/*
 %{_libdir}/sysctl.d/50-default.conf
 %{_libdir}/systemd/user/*
-
-%{_libdir}/systemd/system/systemd-journal-gatewayd.*
-%{_libdir}/systemd/systemd-journal-gatewayd
-#%{_mandir}/man8/systemd-journal-gatewayd.*
-%{_datadir}/systemd/gatewayd
 
 %dir /lib/udev/
 /lib/udev/*
@@ -409,6 +396,7 @@ fi
 %{_datadir}/zsh/site-functions/*
 
 /usr/lib/systemd/catalog/systemd*.catalog
+/usr/lib/systemd/ntp-units.d/90-systemd.list
 /usr/lib/kernel/install.d/50-depmod.install
 /usr/lib/kernel/install.d/90-loaderentry.install
 
@@ -433,6 +421,8 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/logind.conf
 %config(noreplace) %{_sysconfdir}/systemd/system.conf
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
+%config(noreplace) %{_sysconfdir}/systemd/resolved.conf
+%config(noreplace) %{_sysconfdir}/systemd/timesyncd.conf
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 /lib/systemd/system/default.target
 /lib/systemd/system/user@.service
