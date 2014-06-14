@@ -31,11 +31,9 @@ Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.t
 Source1:        systemd-stop-user-sessions.service
 Source2:        tests.xml
 Source3:        systemctl-user
-Patch0:         systemd-212-video.patch
 Patch1:         systemd-208-pkgconfigdir.patch
-Patch2:         systemd-187-make-readahead-depend-on-sysinit.patch
-Patch3:         systemd-208-install-test-binaries.patch
-Patch4:         systemd-212-no-relative-symlink.patch
+Patch2:         systemd-208-install-test-binaries.patch
+Patch3:         systemd-212-no-relative-symlink.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -150,11 +148,9 @@ glib-based applications using libudev functionality.
 
 %prep
 %setup -q -n %{name}-%{version}/systemd
-%patch0 -p1
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 %build
 ./autogen.sh
