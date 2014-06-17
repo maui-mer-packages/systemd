@@ -145,6 +145,7 @@ glib-based applications using libudev functionality.
   --disable-coredump \
   --disable-static \
   --with-firmware-path=/lib/firmware/updates:/lib/firmware:/system/etc/firmware:/etc/firmware:/vendor/firmware:/firmware/image \
+  --with-kbd-loadkeys=/bin/loadkeys \
   --disable-manpages \
   --disable-python-devel \
   --disable-kdbus \
