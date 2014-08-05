@@ -37,7 +37,8 @@ Provides:       systemd-sysv = %{version}
 Obsoletes:      systemd-sysv < %{version}
 Provides:       systemd-sysv-docs = %{version}
 Obsoletes:      systemd-sysv-docs < %{version}
-
+Provides:       systemd-docs = %{version}
+Obsoletes:      systemd-docs < %{version}
 Provides:       systemd-console-ttyMFD2 = %{version}
 Obsoletes:      systemd-console-ttyMFD2 <= 187
 Provides:       systemd-console-ttyS0 = %{version}
@@ -104,14 +105,6 @@ Obsoletes:      libudev-devel < %{version}
 
 %description devel
 Development headers and auxiliary files for developing applications for systemd.
-
-%package docs
-Summary:   System and session manager man pages
-Group:     Development/Libraries
-Requires:  %{name} = %{version}-%{release}
-
-%description docs
-This package includes the man pages for systemd.
 
 %package -n libgudev1
 Summary:        Libraries for adding libudev support to applications that use glib
@@ -427,10 +420,6 @@ fi
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 /lib/systemd/system/default.target
 /lib/systemd/system/user@.service
-
-%files docs
-%defattr(-,root,root,-)
-#%doc %{_mandir}/man?/*
 
 %files analyze
 %defattr(-,root,root,-)
