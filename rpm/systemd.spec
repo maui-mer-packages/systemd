@@ -20,7 +20,8 @@ BuildRequires:  gperf
 BuildRequires:  xz-devel
 BuildRequires:  kmod-devel >= 15
 BuildRequires:  fdupes
-BuildRequires:  coreutils >= 8.0
+# ln --relative was introduced in 8.16
+BuildRequires:  coreutils >= 8.16
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:       dbus
