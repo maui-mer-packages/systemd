@@ -1,6 +1,6 @@
 Name:           systemd
 URL:            http://www.freedesktop.org/wiki/Software/systemd
-Version:        214
+Version:        216
 Release:        1
 License:        LGPLv2+ and MIT and GPLv2+
 Group:          System/System Control
@@ -314,6 +314,7 @@ fi
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.locale1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.timedate1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.machine1.conf
+%config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.resolve1.conf
 %config(noreplace) %{_sysconfdir}/systemd/bootchart.conf
 %config(noreplace) %{_sysconfdir}/pam.d/systemd-user
 %ghost %{_sysconfdir}/udev/hwdb.bin
@@ -322,6 +323,7 @@ fi
 %config(noreplace) %{_sysconfdir}/xdg/systemd/user
 %{_sysconfdir}/systemd/system/*
 %{_libdir}/tmpfiles.d/*
+%{_libdir}/sysusers.d/*
 %{_libdir}/sysctl.d/50-default.conf
 %{_libdir}/systemd/user/*
 
@@ -336,7 +338,12 @@ fi
 /bin/loginctl
 /bin/journalctl
 /bin/machinectl
+/bin/networkctl
 /bin/systemd-tmpfiles
+/bin/systemd-escape
+/bin/systemd-firstboot
+/bin/systemd-sysusers
+%{_bindir}/systemd-path
 %{_bindir}/systemd-run
 /bin/udevadm
 %{_bindir}/kernel-install
@@ -356,7 +363,9 @@ fi
 %{_sbindir}/udevadm
 /%{_lib}/systemd
 %{_datadir}/dbus-1/*/org.freedesktop.systemd1.*
+%{_datadir}/dbus-1/*/org.freedesktop.resolve1.*
 %{_defaultdocdir}/systemd
+%{_datadir}/factory/*
 %{_datadir}/dbus-1/system-services/org.freedesktop.hostname1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.login1.service
 %{_datadir}/dbus-1/system-services/org.freedesktop.locale1.service
@@ -389,7 +398,6 @@ fi
 %{_datadir}/zsh/site-functions/*
 
 /usr/lib/systemd/catalog/systemd*.catalog
-/usr/lib/systemd/ntp-units.d/90-systemd.list
 /usr/lib/kernel/install.d/50-depmod.install
 /usr/lib/kernel/install.d/90-loaderentry.install
 
@@ -427,6 +435,8 @@ fi
 %files libs
 /lib/security/pam_systemd.so
 %{_libdir}/libnss_myhostname.so.2
+%{_libdir}/libnss_mymachines.so.2
+%{_libdir}/libnss_resolve.so.2
 %{_libdir}/libsystemd-daemon.so.*
 %{_libdir}/libsystemd-login.so.*
 %{_libdir}/libsystemd-journal.so.*
