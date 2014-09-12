@@ -20,6 +20,11 @@ BuildRequires:  gperf
 BuildRequires:  xz-devel
 BuildRequires:  kmod-devel >= 15
 BuildRequires:  fdupes
+BuildRequires:  cryptsetup-luks-devel
+BuildRequires:  gnutls-devel
+BuildRequires:  elfutils-devel
+BuildRequires:  libidn-devel
+BuildRequires:  libcurl-devel
 # ln --relative was introduced in 8.16
 BuildRequires:  coreutils >= 8.16
 Requires(post): /sbin/ldconfig
