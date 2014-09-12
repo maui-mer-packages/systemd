@@ -439,6 +439,7 @@ fi
 %{_bindir}/systemd-analyze
 
 %files libs
+%defattr(-,root,root,-)
 /lib/security/pam_systemd.so
 %{_libdir}/libnss_myhostname.so.2
 %{_libdir}/libnss_mymachines.so.2
@@ -451,6 +452,7 @@ fi
 %{_libdir}/libudev.so.*
 
 %files devel
+%defattr(-,root,root,-)
 %dir %{_includedir}/systemd
 %{_libdir}/libsystemd-daemon.so
 %{_libdir}/libsystemd-login.so
