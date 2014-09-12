@@ -1,0 +1,28 @@
+from Config import *
+
+# This package doesn't have a changelog
+addFilter("no-changelogname-tag")
+
+# Unstripped libraries
+addFilter("systemd-libs.* unstripped-binary-or-object")
+addFilter("libgudev1.* unstripped-binary-or-object")
+
+# Summary starts with "systemd"
+addFilter("systemd-libs.* summary-not-capitalized")
+
+# Depends on systemd = $version but that's OK
+addFilter("libgudev1.* shlib-fixed-dependency")
+
+# Obsoletes older systemd version and replaces it
+addFilter("systemd-libs.* obsolete-not-provided")
+
+# Suppress errors for /etc/init.d/README
+addFilter(".*/etc/init.d/README")
+addFilter("systemd.* incoherent-init-script-name README")
+
+# RPM macros are fine in /etc
+addFilter("systemd.* non-conffile-in-etc /etc/rpm/macros.systemd")
+
+# systemd.pc is reported as invalid but it's not
+addFilter("W: invalid-pkgconfig-file .*")
+setBadness("invalid-pkgconfig-file", 0)

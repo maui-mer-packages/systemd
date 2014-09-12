@@ -35,6 +35,7 @@ Requires:       systemd-config
 # fsck with -l option was introduced in 2.21.2 packaging
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
+Source100:      systemd-rpmlintrc
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
