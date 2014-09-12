@@ -36,7 +36,6 @@ Requires:       systemd-config
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source1:        systemd-stop-user-sessions.service
-Patch1:         systemd-208-pkgconfigdir.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -133,7 +132,6 @@ glib-based applications using libudev functionality.
 
 %prep
 %setup -q -n %{name}-%{version}/systemd
-%patch1 -p1
 
 %build
 ./autogen.sh
@@ -472,9 +470,9 @@ fi
 %{_libdir}/pkgconfig/libsystemd-journal.pc
 %{_libdir}/pkgconfig/libsystemd-id128.pc
 %{_libdir}/pkgconfig/libsystemd.pc
-%{_libdir}/pkgconfig/systemd.pc
 %{_libdir}/pkgconfig/libudev.pc
-%{_libdir}/pkgconfig/udev.pc
+%{_datadir}/pkgconfig/systemd.pc
+%{_datadir}/pkgconfig/udev.pc
 
 %files -n libgudev1
 %defattr(-,root,root,-)
