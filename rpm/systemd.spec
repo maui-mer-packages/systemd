@@ -100,7 +100,7 @@ Conflicts:      systemd <= 187
 Libraries for systemd and udev, as well as the systemd PAM module.
 
 %package devel
-Group:          System Environment/Base
+Group:          Development/Libraries
 Summary:        Development headers for systemd
 License:        LGPLv2+ and MIT
 Requires:       %{name} = %{version}-%{release}
