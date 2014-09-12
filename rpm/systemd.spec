@@ -311,8 +311,8 @@ fi
 %dir %{_localstatedir}/lib/systemd/coredump
 %ghost %{_localstatedir}/lib/systemd/random-seed
 %ghost %{_localstatedir}/lib/systemd/catalog/database
+%ghost %{_localstatedir}/log/README
 
-%{_localstatedir}/log/README
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.systemd1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.hostname1.conf
 %config(noreplace) %{_sysconfdir}/dbus-1/system.d/org.freedesktop.login1.conf
