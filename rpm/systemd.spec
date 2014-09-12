@@ -68,13 +68,13 @@ state, maintains mount and automount points and implements an
 elaborate transactional dependency-based service control logic. It can
 work as a drop-in replacement for sysvinit.
 
-%package config-mer
+%package config-maui
 Summary:    Default configuration for systemd
 Group:      System/System Control
 Requires:   %{name} = %{version}-%{release}
 Provides:   systemd-config
 
-%description config-mer
+%description config-maui
 This package provides default configuration for systemd
 
 %package analyze
@@ -421,7 +421,7 @@ fi
 %exclude %{_sysconfdir}/systemd/system/multi-user.target.wants/remote-fs.target
 %exclude /lib/systemd/system/user@.service
 
-%files config-mer
+%files config-maui
 %defattr(-,root,root,-)
 %config(noreplace) %{_sysconfdir}/systemd/journald.conf
 %config(noreplace) %{_sysconfdir}/systemd/logind.conf
@@ -429,6 +429,7 @@ fi
 %config(noreplace) %{_sysconfdir}/systemd/user.conf
 %config(noreplace) %{_sysconfdir}/systemd/resolved.conf
 %config(noreplace) %{_sysconfdir}/systemd/timesyncd.conf
+%config(noreplace) %{_sysconfdir}/systemd/journal-upload.conf
 %config(noreplace) %{_sysconfdir}/udev/udev.conf
 /lib/systemd/system/default.target
 /lib/systemd/system/user@.service
