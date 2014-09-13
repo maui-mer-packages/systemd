@@ -35,7 +35,6 @@ Requires:       systemd-config
 # fsck with -l option was introduced in 2.21.2 packaging
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
-Source1:        systemd-stop-user-sessions.service
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -204,11 +203,6 @@ mkdir -p %{buildroot}%{_sysconfdir}/binfmt.d
 rm %{buildroot}/%{_docdir}/systemd/*
 
 mkdir -p %{buildroot}/etc/systemd/system/basic.target.wants
-
-# Fix shutdown hang problem with user-serssions
-install -D -m 644 %{SOURCE1} %{buildroot}/lib/systemd/system/systemd-stop-user-sessions.service
-mkdir -p %{buildroot}/lib/systemd/system/shutdown.target.wants
-ln -s ../systemd-stop-user-sessions.service %{buildroot}/lib/systemd/system/shutdown.target.wants/systemd-stop-user-sessions.service
 
 %fdupes  %{buildroot}/%{_datadir}/man/
 
