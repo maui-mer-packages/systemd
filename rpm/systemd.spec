@@ -228,6 +228,13 @@ getent group systemd-network >/dev/null 2>&1 || groupadd -r systemd-network 2>&1
 getent passwd systemd-network >/dev/null 2>&1 || useradd -r -l -g systemd-network -d / -s /usr/sbin/nologin -c "systemd Network Management" systemd-network >/dev/null 2>&1 || :
 getent group systemd-resolve >/dev/null 2>&1 || groupadd -r systemd-resolve 2>&1 || :
 getent passwd systemd-resolve >/dev/null 2>&1 || useradd -r -l -g systemd-resolve -d / -s /usr/sbin/nologin -c "systemd Resolver" systemd-resolve >/dev/null 2>&1 || :
+getent group systemd-journal-gateway >/dev/null 2>&1 || groupadd -r systemd-journal-gateway 2>&1 || :
+getent passwd systemd-journal-gateway >/dev/null 2>&1 || useradd -r -l -g systemd-journal-gateway -d / -s /usr/sbin/nologin -c "systemd Journal Gateway" systemd-journal-gateway >/dev/null 2>&1 || :
+getent group systemd-journal-remote >/dev/null 2>&1 || groupadd -r systemd-journal-remote 2>&1 || :
+getent passwd systemd-journal-remote >/dev/null 2>&1 || useradd -r -l -g systemd-journal-remote -d / -s /usr/sbin/nologin -c "systemd Journal Remote" systemd-journal-remote >/dev/null 2>&1 || :
+getent group systemd-journal-upload >/dev/null 2>&1 || groupadd -r systemd-journal-upload 2>&1 || :
+getent passwd systemd-journal-upload >/dev/null 2>&1 || useradd -r -l -g systemd-journal-upload -d / -s /usr/sbin/nologin -c "systemd Journal Upload" systemd-journal-upload >/dev/null 2>&1 || :
+
 #### This user and group are needed for kdbus which is disable at the moment,
 #### besides it's not a valid group name see error "groupadd: 'systemd-bus-proxy' is not a valid group name"
 #getent group systemd-bus-proxy >/dev/null 2>&1 || groupadd -r systemd-bus-proxy 2>&1 || :
