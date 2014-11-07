@@ -35,6 +35,7 @@ Requires:       systemd-config
 # fsck with -l option was introduced in 2.21.2 packaging
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
+Source1:        systemctl-user
 Source100:      systemd-rpmlintrc
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
@@ -205,6 +206,9 @@ rm %{buildroot}/%{_docdir}/systemd/*
 
 mkdir -p %{buildroot}/etc/systemd/system/basic.target.wants
 
+# Add systemctl-user helper script
+install -D -m 754 %{SOURCE1} %{buildroot}/bin/systemctl-user
+
 %fdupes  %{buildroot}/%{_datadir}/man/
 
 mkdir -p %{buildroot}/lib/security/
@@ -336,6 +340,7 @@ fi
 /lib/udev/*
 
 /bin/systemctl
+/bin/systemctl-user
 /bin/systemd-notify
 /bin/systemd-ask-password
 /bin/systemd-tty-ask-password-agent
