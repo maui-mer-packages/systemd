@@ -25,10 +25,8 @@ BuildRequires:  gnutls-devel
 BuildRequires:  elfutils-devel
 BuildRequires:  libidn-devel
 BuildRequires:  libcurl-devel
-%ifnarch %{arm}
 # ln --relative was introduced in 8.16
 BuildRequires:  coreutils >= 8.16
-%endif
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:       dbus
@@ -38,7 +36,6 @@ Requires:       systemd-config
 Requires:       util-linux >= 2.21.2
 Source0:        http://www.freedesktop.org/software/systemd/%{name}-%{version}.tar.xz
 Source100:      systemd-rpmlintrc
-Patch0:         0001-Build-without-ln-relative.patch
 Provides:       udev = %{version}
 Obsoletes:      udev < 184 
 Provides:       systemd-sysv = %{version}
@@ -135,11 +132,6 @@ glib-based applications using libudev functionality.
 
 %prep
 %setup -q -n %{name}-%{version}/systemd
-
-%ifarch %{arm}
-%patch0 -p1
-chmod 755 lnsr
-%endif
 
 %build
 ./autogen.sh
